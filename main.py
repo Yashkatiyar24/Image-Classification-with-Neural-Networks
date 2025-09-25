@@ -4,6 +4,7 @@ from tensorflow.keras.datasets import cifar10
 from tensorflow.keras import layers, models
 import argparse
 import os
+import numpy as np
 
 # Parse CLI args for epochs and retrain flag
 parser = argparse.ArgumentParser(add_help=False)
@@ -90,6 +91,17 @@ if not args.no_plots:
     else:
         print("No preview image found (looked for 1.jpg/2.jpg/3.jpg/4.jpg/wave.1.jpg).")
 
-prediction = model.predict(np.array([training_images]))
-index = np.argmax(prediction)
-print(f"Prediction: {class_names[index]}")
+# Quick prediction demo on one test image
+idx = 0
+sample = test_images[idx:idx+1]
+probs = model.predict(sample, verbose=0)
+pred_idx = int(np.argmax(probs[0]))
+true_idx = int(test_labels[idx][0])
+print(f"Predicted: {class_names[pred_idx]} (p={probs[0][pred_idx]:.2f}) | True: {class_names[true_idx]}")
+
+if not args.no_plots:
+    plt.figure()
+    plt.imshow(test_images[idx])
+    plt.title(f"Pred: {class_names[pred_idx]} vs True: {class_names[true_idx]}")
+    plt.axis('off')
+    plt.show()
